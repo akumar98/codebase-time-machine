@@ -1,0 +1,192 @@
+.code-viewer {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.file-name {
+    font-family: 'Courier New', monospace;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.file-status {
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.file-status.added {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.file-status.modified {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.file-status.deleted {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-error);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.view-mode-toggle {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.view-mode-toggle .btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-xs);
+}
+
+.view-mode-toggle .btn.active {
+    background: rgba(79, 158, 255, 0.2);
+    border-color: var(--color-accent-blue);
+    color: var(--color-accent-blue);
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl);
+    gap: var(--spacing-md);
+    color: var(--color-text-muted);
+}
+
+.code-split-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    max-height: 600px;
+}
+
+.code-pane {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-primary);
+}
+
+.pane-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.old-pane .pane-header {
+    color: var(--color-error);
+}
+
+.new-pane .pane-header {
+    color: var(--color-success);
+}
+
+.code-content {
+    display: flex;
+    overflow: auto;
+    flex: 1;
+}
+
+.line-numbers {
+    background: var(--color-bg-secondary);
+    padding: var(--spacing-md) var(--spacing-sm);
+    text-align: right;
+    user-select: none;
+    color: var(--color-text-disabled);
+    font-family: 'Courier New', monospace;
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+    min-width: 50px;
+}
+
+.line-number {
+    height: 21px;
+}
+
+.code-lines {
+    flex: 1;
+    padding: var(--spacing-md);
+    font-family: 'Courier New', monospace;
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+.code-line {
+    white-space: pre;
+    height: 21px;
+}
+
+.code-line.old {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-text-secondary);
+}
+
+.code-line.new {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-text-secondary);
+}
+
+.code-unified-view {
+    max-height: 600px;
+    overflow: auto;
+}
+
+.code-section {
+    margin-top: var(--spacing-md);
+}
+
+.code-section:first-child {
+    margin-top: 0;
+}
+
+.section-label {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    font-family: 'Courier New', monospace;
+}
+
+.old-section .section-label {
+    color: var(--color-error);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.new-section .section-label {
+    color: var(--color-success);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.section-content {
+    display: flex;
+}
