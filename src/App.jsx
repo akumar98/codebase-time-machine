@@ -83,7 +83,12 @@ function App() {
             <header className="app-header">
                 <div className="container">
                     <div className="header-content">
-                        <h1 className="app-title">
+                        <h1
+                            className="app-title"
+                            onClick={() => setRepositoryLoaded(false)}
+                            style={{ cursor: 'pointer' }}
+                            title="Return to repository selection"
+                        >
                             <span className="gradient-text">Codebase Time Machine</span>
                         </h1>
                         <p className="app-subtitle">Navigate through {commits.length} commits</p>
