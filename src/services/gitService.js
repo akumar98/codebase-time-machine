@@ -18,15 +18,18 @@ class GitService {
      */
     async loadGitHubRepository(githubUrl) {
         try {
-            this.repositoryType = 'github';
-            this.dir = '/repo';
-
-            // Clean up any existing repository
-            try {
-                await fs.promises.rmdir(this.dir, { recursive: true });
-            } catch (e) {
-                // Directory might not exist, that's fine
+            // Clean up previous repository if it exists
+            if (this.dir) {
+                try {
+                    await this.deleteDirectory(this.dir);
+                } catch (e) {
+                    console.warn('Cleanup warning:', e);
+                }
             }
+
+            // Use a unique directory for each clone to avoid collisions
+            this.dir = `/repo-${Date.now()}`;
+            await fs.promises.mkdir(this.dir);
 
             // Parse GitHub URL to get owner and repo
             const urlPattern = /github\.com\/([^\/]+)\/([^\/]+)/;
@@ -88,9 +91,9 @@ class GitService {
 
             // Clean up any existing repository
             try {
-                await fs.promises.rmdir(this.dir, { recursive: true });
+                await this.deleteDirectory(this.dir);
             } catch (e) {
-                // Directory might not exist, that's fine
+                console.warn('Cleanup warning:', e);
             }
 
             // Copy files from the directory handle to the virtual filesystem
@@ -124,6 +127,29 @@ class GitService {
         } catch (error) {
             console.error('Error copying directory:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Recursively delete a directory and its contents
+     */
+    async deleteDirectory(dirPath) {
+        try {
+            const stats = await fs.promises.stat(dirPath).catch(() => null);
+            if (!stats) return;
+
+            if (stats.isDirectory()) {
+                const files = await fs.promises.readdir(dirPath);
+                for (const file of files) {
+                    await this.deleteDirectory(`${dirPath}/${file}`);
+                }
+                await fs.promises.rmdir(dirPath);
+            } else {
+                await fs.promises.unlink(dirPath);
+            }
+        } catch (error) {
+            console.error(`Error deleting ${dirPath}:`, error);
+            // Don't throw, try to continue
         }
     }
 
