@@ -19,11 +19,17 @@ function App() {
     const [fileChanges, setFileChanges] = useState(new Map());
     const [architecturalDecisions, setArchitecturalDecisions] = useState([]);
 
-    const handleRepositoryLoad = async (directoryHandle) => {
+    const handleRepositoryLoad = async (config) => {
         setLoading(true);
 
         try {
-            const result = await gitService.loadRepository(directoryHandle);
+            let result;
+
+            if (config.type === 'github') {
+                result = await gitService.loadGitHubRepository(config.url);
+            } else {
+                result = await gitService.loadLocalRepository(config.directoryHandle);
+            }
 
             if (result.success) {
                 const commitList = await gitService.getCommits(500);

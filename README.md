@@ -4,6 +4,8 @@ Navigate any codebase through time - understand the evolution of features and ar
 
 ## 🌟 Features
 
+- **GitHub Repository Loading**: Load and analyze any public repository from GitHub
+- **Local Repository Support**: Works with local git repositories using File System Access API
 - **Timeline Visualization**: Interactive commit timeline with search and date filtering
 - **Architecture Tracking**: Automatically identify and categorize architectural decisions
 - **Code Evolution**: Track how files evolve over time with hotspot analysis
@@ -64,12 +66,28 @@ The application will open at `http://localhost:5173`
 
 ## 📖 How to Use
 
-1. **Load a Repository**: Click "Load Git Repository" and select a folder containing a `.git` directory
+### Option 1: Load from GitHub (Recommended)
+1. Click the **GitHub** tab
+2. Enter any public GitHub repository URL (e.g., `https://github.com/facebook/react`)
+3. Or click one of the suggested popular repositories
+4. Click **Load from GitHub** and wait for the repository to clone
+5. Explore the commit history!
+
+### Option 2: Load Local Repository
+1. Click the **Local** tab
+2. Click **Select Local Repository**  
+3. Choose a folder containing a `.git` directory
+4. The application will load and analyze the repository
+
+### Navigating the Application
+1. **Timeline View**: Browse through commits, search by message or author, filter by date
 2. **Explore the Timeline**: Browse through commits, search by message or author, filter by date
 3. **View Commits**: Click any commit to see file changes and details
-4. **Inspect Diffs**: Click on any changed file to see the code differences
-5. **Architecture View**: Switch to the Architecture tab to see significant architectural decisions
-6. **Evolution View**: Explore code hotspots, contributor stats, and commit patterns
+2. **Inspect Diffs**: Click on any changed file to see the code differences (side-by-side or unified view)
+3. **Architecture View**: Switch to the Architecture tab to see significant architectural decisions  
+4. **Evolution View**: Explore code hotspots, contributor stats, and commit patterns
+
+> **Note**: GitHub loading works with any public repository. For private repositories, you would need to implement authentication (not currently supported).
 
 ## 🛠️ Technology Stack
 

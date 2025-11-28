@@ -1,4 +1,5 @@
 import git from 'isomorphic-git';
+import http from 'isomorphic-git/http/web';
 import FS from '@isomorphic-git/lightning-fs';
 
 const fs = new FS('codebase-time-machine-fs');
@@ -9,22 +10,80 @@ class GitService {
         this.dir = null;
         this.commits = [];
         this.fileHandle = null;
+        this.repositoryType = null; // 'local' or 'github'
+    }
+
+    /**
+     * Load a repository from GitHub URL
+     */
+    async loadGitHubRepository(githubUrl) {
+        try {
+            this.repositoryType = 'github';
+            this.dir = '/repo';
+
+            // Clean up any existing repository
+            try {
+                await fs.promises.rmdir(this.dir, { recursive: true });
+            } catch (e) {
+                // Directory might not exist, that's fine
+            }
+
+            // Parse GitHub URL to get owner and repo
+            const urlPattern = /github\.com\/([^\/]+)\/([^\/]+)/;
+            const match = githubUrl.match(urlPattern);
+
+            if (!match) {
+                throw new Error('Invalid GitHub URL. Please use format: https://github.com/owner/repo');
+            }
+
+            const [, owner, repoName] = match;
+            const cleanRepoName = repoName.replace(/\.git$/, '');
+
+            // Clone the repository
+            console.log(`Cloning ${owner}/${cleanRepoName}...`);
+
+            await git.clone({
+                fs,
+                http,
+                dir: this.dir,
+                url: `https://github.com/${owner}/${cleanRepoName}`,
+                corsProxy: 'https://cors.isomorphic-git.org',
+                depth: 100, // Limit clone depth for performance
+                singleBranch: true,
+                onProgress: (progress) => {
+                    console.log('Progress:', progress);
+                },
+            });
+
+            return { success: true, owner, repo: cleanRepoName };
+        } catch (error) {
+            console.error('Error loading GitHub repository:', error);
+            return { success: false, error: error.message };
+        }
     }
 
     /**
      * Load a local git repository using File System Access API
      */
-    async loadRepository(directoryHandle) {
+    async loadLocalRepository(directoryHandle) {
         try {
+            this.repositoryType = 'local';
             this.fileHandle = directoryHandle;
             this.dir = '/repo';
+
+            // Clean up any existing repository
+            try {
+                await fs.promises.rmdir(this.dir, { recursive: true });
+            } catch (e) {
+                // Directory might not exist, that's fine
+            }
 
             // Copy files from the directory handle to the virtual filesystem
             await this.copyDirectoryToFS(directoryHandle, this.dir);
 
             return { success: true };
         } catch (error) {
-            console.error('Error loading repository:', error);
+            console.error('Error loading local repository:', error);
             return { success: false, error: error.message };
         }
     }
