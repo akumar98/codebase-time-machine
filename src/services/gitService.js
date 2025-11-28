@@ -38,27 +38,42 @@ class GitService {
 
             const [, owner, repoName] = match;
             const cleanRepoName = repoName.replace(/\.git$/, '');
+            const repoUrl = `https://github.com/${owner}/${cleanRepoName}`;
+            const proxyUrl = 'https://cors.isomorphic-git.org';
 
             // Clone the repository
-            console.log(`Cloning ${owner}/${cleanRepoName}...`);
+            console.log(`Starting clone of ${owner}/${cleanRepoName}...`);
+            console.log(`Using proxy: ${proxyUrl}`);
 
             await git.clone({
                 fs,
                 http,
                 dir: this.dir,
-                url: `https://github.com/${owner}/${cleanRepoName}`,
-                corsProxy: 'https://cors.isomorphic-git.org',
-                depth: 100, // Limit clone depth for performance
+                url: repoUrl,
+                corsProxy: proxyUrl,
+                depth: 20, // Reduced depth for stability
                 singleBranch: true,
                 onProgress: (progress) => {
-                    console.log('Progress:', progress);
+                    console.log('Git Clone Progress:', progress);
                 },
             });
 
+            console.log('Clone completed successfully');
             return { success: true, owner, repo: cleanRepoName };
         } catch (error) {
             console.error('Error loading GitHub repository:', error);
-            return { success: false, error: error.message };
+
+            // Provide more specific error messages
+            let errorMessage = error.message;
+            if (error.message.includes('404')) {
+                errorMessage = 'Repository not found or is private. Please check the URL.';
+            } else if (error.message.includes('Failed to fetch')) {
+                errorMessage = 'Network error or CORS issue. The proxy might be blocked by your network.';
+            } else if (error.code === 'HttpError') {
+                errorMessage = `HTTP Error: ${error.data.statusCode} ${error.data.statusMessage}`;
+            }
+
+            return { success: false, error: errorMessage, details: error };
         }
     }
 

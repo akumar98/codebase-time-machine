@@ -7,10 +7,8 @@ const RepositoryLoader = ({ onLoad, loading }) => {
     const [githubUrl, setGithubUrl] = useState('');
     const [loadingMessage, setLoadingMessage] = useState('');
 
-    const handleLoadGitHub = async (e) => {
-        e?.preventDefault();
-
-        if (!githubUrl.trim()) {
+    const loadRepository = async (url) => {
+        if (!url.trim()) {
             setError('Please enter a GitHub repository URL');
             return;
         }
@@ -19,13 +17,21 @@ const RepositoryLoader = ({ onLoad, loading }) => {
         setLoadingMessage('Cloning repository from GitHub...');
 
         try {
-            await onLoad({ type: 'github', url: githubUrl });
+            const result = await onLoad({ type: 'github', url: url });
+            if (result && !result.success) {
+                throw new Error(result.error || 'Unknown error occurred');
+            }
         } catch (err) {
             console.error('Error loading GitHub repository:', err);
-            setError('Failed to load GitHub repository: ' + err.message);
+            setError(err.message);
         } finally {
             setLoadingMessage('');
         }
+    };
+
+    const handleLoadGitHub = async (e) => {
+        e?.preventDefault();
+        await loadRepository(githubUrl);
     };
 
     const handleLoadLocal = async () => {
@@ -158,7 +164,10 @@ const RepositoryLoader = ({ onLoad, loading }) => {
                                     <button
                                         key={repo.url}
                                         className="repo-chip"
-                                        onClick={() => setGithubUrl(repo.url)}
+                                        onClick={() => {
+                                            setGithubUrl(repo.url);
+                                            loadRepository(repo.url);
+                                        }}
                                         disabled={loading}
                                     >
                                         {repo.name}
@@ -195,11 +204,22 @@ const RepositoryLoader = ({ onLoad, loading }) => {
                 )}
 
                 {error && (
-                    <div className="error-message">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor" />
-                        </svg>
-                        {error}
+                    <div className="error-container">
+                        <div className="error-message">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor" />
+                            </svg>
+                            {error}
+                        </div>
+                        <div className="debug-tips">
+                            <p><strong>Troubleshooting Tips:</strong></p>
+                            <ul>
+                                <li>Ensure the URL is a public repository</li>
+                                <li>Check if your network blocks <code>cors.isomorphic-git.org</code></li>
+                                <li>Try a smaller repository first</li>
+                                <li>If all else fails, clone locally and use the "Local" tab</li>
+                            </ul>
+                        </div>
                     </div>
                 )}
 
